@@ -1,0 +1,175 @@
+/* Calendar container */
+.calendar-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px;
+  }
+  
+  /* Main calendar layout */
+  .calendar {
+    border: 1px solid black;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%; /* Fill the available width */
+    height: 550px; /* Allow the height to adjust based on content */
+    padding: 20px;
+  }
+  
+  /* Calendar header */
+  .calendar-header {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  
+  /* Navigation button */
+  .nav-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    color: #000000;
+  }
+  
+  /* Month label */
+  .month-label {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333333;
+  }
+  
+  /* Days of week */
+  .days-of-week {
+    display: flex;
+    flex-wrap: wrap; /* Allow days to wrap on smaller screens */
+    justify-content: space-between; /* Distribute days evenly */
+    margin-bottom: 8px;
+  }
+  
+  /* Day header */
+  .day-header {
+    flex-basis: calc(100% / 7 - 10px); /* Adjust width of day header with spacing */
+    text-align: center;
+    font-weight: bold;
+    color: #333333;
+    margin-bottom: 8px;
+  }
+  
+  /* Calendar grid */
+  .calendar-grid {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Week row */
+  .week-row {
+    display: flex;
+  }
+  
+  /* Calendar cell */
+  .calendar-cell {
+    flex: 1;
+    text-align: center;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  /* Disabled cell (not in current month) */
+  .calendar-cell.disabled {
+    color: #cccccc;
+  }
+  
+  /* Today's cell */
+  .calendar-cell.today {
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #bfab5b;
+  }
+  
+  
+  /* Event Form */
+  .event-form {
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;    
+  }
+  
+  .event-form h2 {
+    font-size: 24px;
+  }
+  
+  .event-form p {
+    margin-bottom: 8px;
+  }
+  
+  .event-form input[type="text"],
+  .event-form button {
+    width: 250px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  
+  .event-form input[type="text"]:focus {
+    outline: none;
+    border-color: #000000;
+    box-shadow: 0 0 5px rgba(6, 6, 6, 0.5);
+  }
+  
+  .event-form button {
+    margin-top: 25px;
+    background-color: #007bff;
+    color: #000000;
+    border: none;
+    border-radius: 4px;
+    padding: 8px;
+    cursor: pointer;
+  }
+  
+  .event-form button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+
+    .calendar{
+        width: 100%;
+    }
+
+    .event-form {
+      padding: 12px;
+    }
+  
+    .event-form h2 {
+      font-size: 20px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .calendar-header,
+    .days-of-week,
+    .calendar-grid {
+      font-size: 0.8em; /* Reduce font size for better readability */
+    }
+  }
+  
+  
+  /* Media queries for responsiveness */
+  @media (max-width: 768px) {
+    /* Adjust styles for smaller screens */
+    .days-of-week {
+      flex-wrap: wrap;
+    }
+
+    .day-header {
+      flex-basis: calc(100% / 7 - 10px); /* Adjust day header width for smaller screens */
+      margin-bottom: 4px;
+    }
+    
+    .calendar {
+      padding: 10px;
+    }
+  }

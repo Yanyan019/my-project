@@ -1,0 +1,169 @@
+/* Calendar container */
+.calendar-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 20px; /* Add padding around the calendar for spacing */
+  }
+  
+  /* Main calendar layout */
+  .calendar {
+    border: 1px solid black;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    max-width: 100%; /* Ensure calendar doesn't exceed its container */
+    width: 100%; /* Fill the available width */
+    height: auto; /* Allow the height to adjust based on content */
+  }
+  
+  /* Calendar header */
+  .calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  
+  /* Navigation button */
+  .nav-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    color: #000000;
+  }
+  
+  /* Month label */
+  .month-label {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333333;
+  }
+  
+  /* Days of week */
+  .days-of-week {
+    display: flex;
+    flex-wrap: wrap; /* Allow days to wrap on smaller screens */
+    justify-content: space-between; /* Distribute days evenly */
+    margin-bottom: 8px;
+  }
+  
+  /* Day header */
+  .day-header {
+    flex-basis: calc(100% / 7 - 10px); /* Adjust width of day header with spacing */
+    text-align: center;
+    font-weight: bold;
+    color: #333333;
+    margin-bottom: 8px;
+  }
+  
+  /* Calendar grid */
+  .calendar-grid {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Week row */
+  .week-row {
+    display: flex;
+  }
+  
+  /* Calendar cell */
+  .calendar-cell {
+    flex: 1;
+    text-align: center;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  /* Disabled cell (not in current month) */
+  .calendar-cell.disabled {
+    color: #cccccc;
+  }
+  
+  /* Today's cell */
+  .calendar-cell.today {
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #bfab5b;
+  }
+  
+  
+  /* Event Form */
+  .event-form {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+  }
+  
+  .event-form h2 {
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+  
+  .event-form p {
+    margin-bottom: 8px;
+  }
+  
+  .event-form input[type="text"],
+  .event-form button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  
+  .event-form input[type="text"]:focus {
+    outline: none;
+    border-color: #000000;
+    box-shadow: 0 0 5px rgba(6, 6, 6, 0.5);
+  }
+  
+  .event-form button {
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    padding: 12px;
+    cursor: pointer;
+  }
+  
+  .event-form button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .event-form {
+      padding: 12px;
+    }
+  
+    .event-form h2 {
+      font-size: 20px;
+    }
+  }
+  
+  
+  
+  
+  /* Media queries for responsiveness */
+  @media (max-width: 768px) {
+    /* Adjust styles for smaller screens */
+    .days-of-week {
+      flex-wrap: wrap;
+    }
+    
+    .day-header {
+      flex-basis: calc(100% / 7 - 10px); /* Adjust day header width for smaller screens */
+      margin-bottom: 4px;
+    }
+    
+    .calendar {
+      padding: 10px;
+    }
+  }

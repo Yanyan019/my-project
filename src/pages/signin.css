@@ -1,0 +1,40 @@
+.signin{
+    background-color: rgb(241, 224, 146);
+}
+.container{
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    height: 100vh;
+}
+.container img{
+    width: 300px;
+    height: 300px;
+}
+.container p{
+    font-size: 24px;
+    font-weight: 500;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+.button-signin button{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    border-radius: 12px;
+    padding: 8px 10px;
+    width: 300px;
+    border: 1px solid black;
+    background-color: white;
+    color: rgb(0, 0, 0);
+    font-size: 18px;
+    font-weight: 500;
+}
+button svg {
+    width: 24px;
+    height: 24px;
+}

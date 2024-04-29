@@ -1,0 +1,124 @@
+
+.task{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    width: 100%;
+    height: auto;
+    border: 1px solid black;
+    padding: 20px;
+    border-radius: 12px;
+}
+.header{
+  width: 100%;
+  justify-content: space-between;
+  display: flex;
+  align-items: center;
+}
+.header h1{
+  font-size: 24px;
+  font-weight: 400;
+}
+.userlist{
+  width: 100%;
+  justify-content: space-between;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 2rem 15px 0 0;
+  margin-top: 30px;
+}
+.tasklist{
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
+  margin-top: 10px;
+}
+
+.toggle-list{
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  gap: 15px;
+  padding: 30px;
+}
+.toggle-list input{
+  width: 100%;
+  height: 50px;
+  border-radius: 8px;
+}
+
+
+/*BUTTON*/
+.header button{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid black;
+  padding: 10px;
+  font-size: 17px;
+  background: transparent;
+  color: black;
+  transition: 0.2s ease-in;
+  font-weight: 500;
+}
+.header button:hover{
+  background-color: #f1e092;
+  color: black;
+  cursor: pointer;
+}
+.button-group{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: 50px;
+}
+
+.button-footer{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.button-footer button{
+  font-size: 17px;
+  font-weight: 500;
+  border-radius: 12px;
+  border: 1px solid black;
+  padding: 8px;
+}
+
+
+
+/* Task.css */
+
+.task {
+  padding: 20px; /* Add padding around the entire task component */
+}
+
+.task-table {
+  width: 100%; /* Make the table fill the available width */
+  border-collapse: collapse; /* Collapse borders between table cells */
+}
+
+.task-table th, .task-table td {
+  padding: 10px; /* Add padding inside table cells */
+  text-align: center;
+}
+
+
+.delete-button {
+  background-color: #ff7377;
+  border: none;
+  padding: 5px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #fff;
+}
