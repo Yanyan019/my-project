@@ -122,3 +122,24 @@
   cursor: pointer;
   color: #fff;
 }
+
+.radio-group label {
+  display: inline-block;
+  margin-right: 20px;
+}
+
+.radio-group input {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  margin-right: 10px;
+  
+}
+
+.radio-group span{
+  font-size: 12px;
+}
+
+.radio-group label{
+  font-size: 12px;
+}
