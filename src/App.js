@@ -7,11 +7,11 @@ import Navbar from './components/navbar';
 //COMPONENTS
 import Signin from './pages/signin';
 import Home from './pages/Home';
-/* import Task from './pages/Task'; */
-/* import Theme from './pages/theme';
+import Task from './pages/Task';
+import Theme from './pages/theme';
 import Calendars  from './pages/calendars';
 import Analytics from './pages/analytics';
- */
+ 
 const App = () => {
   const {user} = useAuth();
 
@@ -23,6 +23,7 @@ const App = () => {
             <Navbar />
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/Task" element={<Task />} />
               {/* Other routes */}
             </Routes>
           </div>
