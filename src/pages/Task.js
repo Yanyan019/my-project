@@ -1,7 +1,7 @@
 import './Task.css'
 import React, { useState, useEffect } from 'react'
 
-import {db} from './context/firebaseconfig'
+import {db} from '../context/firebaseconfig'
 import {
     collection,
     getDocs,
