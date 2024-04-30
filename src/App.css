@@ -6,20 +6,6 @@ body{
   padding: 0;
   background-color: #15161a;
 }
-  .app-container {
-    display: flex;
-    justify-content: space-between;
-    height: 100vh;
-    background-color: #15161a;
-    color: white;
-}
-
-.content {
-  flex: 1; /* Fill remaining space */
-  padding: 20px;
-}
-
-.content-container {
-  max-width: 1200px;
-  margin: 0 auto;
+.app-container{
+  display: flex;
 }

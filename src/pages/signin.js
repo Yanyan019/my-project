@@ -24,18 +24,12 @@ const Signin = () => {
   }, [navigate, user]);
 
   return (
-    <div className='signin'>
-      <div className='container'>
-        <div className='content'>
-          <img src={taskifyLogo} alt='Taskify Logo' className='logo' />
-          <p>Get organized, Achieve more <br /> with Taskify</p>
-        </div>
-        <div className='button-signin'>
-          <button onClick={handleGoogleSignIn}>
-            <FcGoogle /> Continue with Google
-          </button>
-        </div>
-      </div>
+    <div className='container-signin'>
+      <form className='signin-box'>
+        <img src={taskifyLogo} alt='Taskify Logo' />
+        <p>Get organized, Achieve more <br /> with Taskify</p>
+        <button onClick={handleGoogleSignIn}><FcGoogle/> Continue with Google</button>
+      </form>
     </div>
   );
 };
