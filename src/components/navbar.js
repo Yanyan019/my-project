@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-/* import './navbar.css'; */
+import './navbar.css';
 import { useAuth } from '../context/AuthContext';
 /* import { useNavigate } from 'react-router-dom'; */
 //ICONS
@@ -22,55 +22,47 @@ const Navbar = () => {
 /*     navigate(''); */
   };
 
-  
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100">
-      <div className="flex flex-col h-screen">
-        <div className="flex items-center justify-center h-16 logo-container">
-          <h1 className="text-logo">Taskify</h1>
+    <div className="sidenav">
+        <div className='logo'>
+          <h1>Taskify</h1>
         </div>
-        <ul className="nav">
+        <ul className='nav'>
+          {/* OVERVIEW */}
           <li>
-            <Link to="/" className="nav-link">
-              <span className="icon"><LuLayoutDashboard /></span>
-              <span className="text-sm font-medium">Overview</span>
+            <Link to='/' className='nav-link'>
+              <span className='buton'><LuLayoutDashboard className='icon'/>Overview</span>
             </Link>
           </li>
           <li>
-            <Link to="/Task" className="nav-link">
-              <span className="icon"><GrTask /></span>
-              <span className="text-sm font-medium">My Tasks</span>
+            <Link to='/Task' className='nav-link'>
+            <span className='buton'><GrTask className='icon'/>My Task</span>
             </Link>
           </li>
           <li>
-            <Link to="/" className="nav-link">
-              <span className="icon"><AiOutlineFormatPainter /></span>
-              <span className="text-sm font-medium">Theme</span>
-
+            <Link to='/Calendars' className='nav-link'>
+            <span className='buton'><IoCalendarOutline className='icon'/>Calendar</span>
             </Link>
           </li>
           <li>
-            <Link to="/" className="nav-link">
-              <span className="icon"><IoCalendarOutline /></span>
-              <span className="text-sm font-medium">Calendar</span>
+            <Link to='/Analytics' className='nav-link'>
+            <span className='buton'><TbBrandGoogleAnalytics className='icon'/>Analytics</span>
             </Link>
           </li>
           <li>
-            <Link to="/"  className="nav-link">
-              <span className="icon"><TbBrandGoogleAnalytics /></span>
-              <span className="text-sm font-medium">Analytics</span>
+            <Link to='/Theme' className='nav-link'>
+            <span className='buton'><AiOutlineFormatPainter className='icon'/>Theme</span>
             </Link>
           </li>
           <li>
-            <Link to="" className="nav-link" onClick={handleLogout}>
-              <span className="icon"><IoIosLogOut /></span>
-              <span className="text-sm font-medium">Logout</span>
+            <Link to='' className='nav-link'>
+            <span className='buton'><IoIosLogOut className='icon'/>Logout</span>
             </Link>
           </li>
         </ul>
-      </div>
-    </div>      
+    </div>
+      
   );
 }
 

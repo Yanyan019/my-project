@@ -1,56 +1,27 @@
-.container-overview {
-    display: flex;
-    overflow: hidden;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    gap: 15px;
-    color: black;
-    width: 100%;
-    height: auto;
+.home-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  height: 100%;
+}
+.todos{
+  width: 200px;
+  margin: 10px;
+  border: 1px solid blanchedalmond;
+}
+.todo {
+  width: 200px;
+  margin: 10px;
+  border: 1px solid blanchedalmond;
+}
+
+@media screen and (max-width: 800px) {
+  .home-container {
+      flex-direction: column;
   }
-  .tasks{
-    width: 100%;
-    height: 200px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border: 1px solid black;
-    border-radius: 12px;
-    background-color: #7fabfa;
-  }
-  
-  .todos {
-    width: 100%;
-    height: 200px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border: 1px solid black;
-    border-radius: 12px;
-    background-color: #e5aa70;
-  }
+
   .todo {
-    width: 100%;
-    background-color: #5a4fcf;
-    height: 200px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border: 1px solid black;
-    border-radius: 12px;
+      width: 100%;
+      margin: 0 10px;
   }
-  .calendars {
-    width: 100%;
-    height: 200px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border: 1px solid black;
-    border-radius: 12px;
-    background-color: rgb(226, 199, 149);
-  }
-  
-  .overview-content {
-    flex: 1;
-    border: 1px solid black;
-  }
+}

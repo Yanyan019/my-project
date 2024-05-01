@@ -13,6 +13,8 @@ import { Modal } from "flowbite-react";
 import { RiDeleteBin6Line } from "react-icons/ri";
 /* import { FaRegEdit } from "react-icons/fa"; */
 import { IoIosAdd } from "react-icons/io";
+import TextField from '@mui/material/TextField';
+import Box from '@mui/material/Box';
 
 function Task() {
   const [newName, setNewName] = useState("");
@@ -105,7 +107,7 @@ function Task() {
       case "low-priority":
         return "green";
       case "no-priority":
-        return "gray";
+        return "black";
       default:
         return "gray";
     }
@@ -134,89 +136,57 @@ function Task() {
   return (
     <div className="task">
       <div className="header">
+        {/* HEADER */}
         <h1>My Task</h1>
         <button onClick={() => setOpenModal(true)}>
-          <IoIosAdd />
-          Create Task
-        </button>
+          <IoIosAdd/>
+          </button>
+
+        {/* MODAL MGA KAILANGAN LAGYAN NG USER*/}
         <Modal dismissible show={openModal} onClose={() => setOpenModal(false)}>
-          <Modal.Header>Create Task</Modal.Header>
-          <div className="toggle-list">
-            <label>Title </label>
-            <input
-              type="text"
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-            />
-            <label>Description </label>
-            <input
-              type="text"
-              value={newDesc}
-              onChange={(e) => setNewDesc(e.target.value)}
-            />
-            <label>Set Date </label>
-            <input
-              type="date"
-              value={newDate}
-              onChange={(e) => setNewDate(e.target.value)}
-            />
-            <fieldset>
+          <Modal.Header style={{backgroundColor:'#f1e092', borderBottom:'1px solid black'}}>Create Task</Modal.Header>
+          <div className="toggle-list" style={{backgroundColor:'#f1e092'}}>
+            <div className="input-user">
+              <Box component="form" sx={{ '& > :not(style)': {  width: '100%' }, }} noValidate autoComplete="off">
+                <div>
+                <TextField id="standard-basic" label="Title" variant="standard"  value={newName} onChange={(e) => setNewName(e.target.value)} />
+                <TextField id="standard-basic" label="Description" variant="standard" value={newDesc} onChange={(e) => setNewDesc(e.target.value)} style={{backgroundColor:'#f1e092', outline:'none',boxShadow:'none'}}/>
+                </div>
+              </Box>
+              <input type="date" value={newDate} onChange={(e) => setNewDate(e.target.value)} style={{backgroundColor:'#f1e092', outline:'none',boxShadow:'none'}}/>
+            </div>
+            
+            <div className="status">
               <legend>Priority:</legend>
               <div className="radio-group">
-                {/* Priority radio buttons */}
-                <label>
-                  <input
-                    type="radio"
-                    value="no-priority"
-                    checked={newPriority === "no-priority"}
-                    onChange={(e) => setNewPriority(e.target.value)}
-                  />
-                  <span style={{ color: getPriorityColor("no-priority") }}>
-                    No Priority
-                  </span>
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    value="low-priority"
-                    checked={newPriority === "low-priority"}
-                    onChange={(e) => setNewPriority(e.target.value)}
-                  />
-                  <span style={{ color: getPriorityColor("low-priority") }}>
-                    Low Priority
-                  </span>
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    value="medium-priority"
-                    checked={newPriority === "medium-priority"}
-                    onChange={(e) => setNewPriority(e.target.value)}
-                  />
-                  <span style={{ color: getPriorityColor("medium-priority") }}>
-                    Medium Priority
-                  </span>
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    value="high-priority"
-                    checked={newPriority === "high-priority"}
-                    onChange={(e) => setNewPriority(e.target.value)}
-                  />
-                  <span style={{ color: getPriorityColor("high-priority") }}>
-                    High Priority
-                  </span>
-                </label>
+                <button>
+                  {/* <input type="radio" /> */}
+                  <span value="no-priority" checked={newPriority === "no-priority"}onChange={(e) => setNewPriority(e.target.value)} style={{ color: getPriorityColor("no-priority") }}>No Priority</span>
+                </button>
+                <button>
+                  {/* <input type="radio" /> */}
+                  <span value="low-priority" checked={newPriority === "low-priority"}onChange={(e) => setNewPriority(e.target.value)} style={{ color: getPriorityColor("low-priority") }}>Low Priority</span>
+                </button>
+                <button>
+                  {/* <input type="radio"/> */}
+                  <span value="medium-priority"checked={newPriority === "medium-priority"} onChange={(e) => setNewPriority(e.target.value)} style={{ color: getPriorityColor("medium-priority") }}>Medium Priority</span>
+                </button>
+                <button>
+                  {/* <input type="radio" /> */}
+                  <span value="high-priority" checked={newPriority === "high-priority"} onChange={(e) => setNewPriority(e.target.value)} style={{ color: getPriorityColor("high-priority") }}> High Priority</span>
+                </button>
               </div>
-            </fieldset>
+            </div>
+            <div className="Categorys">
+                <legend>Categories:</legend>
+                <button>Personal</button>
+                <button>Work</button>
+                <button>Family</button>
+            </div>
           </div>
-          <Modal.Footer>
+          <Modal.Footer style={{backgroundColor:'#f1e092', borderTop:'1px solid black'}}>
             <div className="button-footer">
-              <button
-                onClick={createUser}
-                style={{ backgroundColor: "#00b13e" }}
-              >
+              <button onClick={createUser}style={{ backgroundColor: "#00b13e" }}>
                 Submit
               </button>
               <button onClick={() => setOpenModal(false)}>Cancel</button>
@@ -224,12 +194,12 @@ function Task() {
           </Modal.Footer>
         </Modal>
       </div>
-
+      {/* OUTPUT TASK LIST - MAKIKITA SA LABAS NG MODAL*/}
       <div className="userlist">
         <table className="task-table">
           <thead>
             <tr>
-              <th>Event Title</th>
+              <th>Title</th>
               <th>Description</th>
               <th>Date</th>
               <th>Priority</th>
@@ -243,11 +213,8 @@ function Task() {
                 <td>{user.eventDesc}</td>
                 <td>{user.eventDate}</td>
                 <td>
-                  <button
-                    onClick={() => deleteUser(user.id)}
-                    className="delete-button"
-                  >
-                    <RiDeleteBin6Line />
+                  <button onClick={() => deleteUser(user.id)}className="delete-button">
+                  <RiDeleteBin6Line />
                   </button>
                 </td>
               </tr>
