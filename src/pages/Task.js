@@ -25,6 +25,14 @@ function Task() {
   const usersCollectionRef = collection(db, "users");
 
   const [openModal, setOpenModal] = useState(true);
+  const [categories] = useState([
+    "Outdoor",
+    "Fitness",
+    "Academics",
+    "Personal",
+    "Birthdays",
+  ]);
+
 
   useEffect(() => {
     const getUsers = async () => {
@@ -210,6 +218,23 @@ function Task() {
                 </label>
               </div>
             </fieldset>
+            <fieldset>
+              <legend>Category:</legend>
+              <div className="radio-group">
+                {/* Category radio buttons */}
+                {categories.map((cat) => (
+                  <label key={cat}>
+                    <input
+                      type="radio"
+                      value={cat}
+                      checked={newCategory === cat}
+                      onChange={() => setNewCategory(cat)}
+                    />
+                    {cat}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
           </div>
           <Modal.Footer>
             <div className="button-footer">
@@ -233,6 +258,7 @@ function Task() {
               <th>Description</th>
               <th>Date</th>
               <th>Priority</th>
+              <th>Category</th>
               <th></th>
             </tr>
           </thead>
@@ -242,6 +268,8 @@ function Task() {
                 <td>{user.eventName}</td>
                 <td>{user.eventDesc}</td>
                 <td>{user.eventDate}</td>
+                <td>{user.eventPriority}</td>
+                <td>{user.eventCategory}</td>
                 <td>
                   <button
                     onClick={() => deleteUser(user.id)}
