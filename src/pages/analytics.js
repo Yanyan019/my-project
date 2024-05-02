@@ -6,20 +6,7 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore, collection, doc, onSnapshot, query, getDocs} from 'firebase/firestore';
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCk4hzdbd9CoC854pPDexP0ngutSM8wIdM",
-  authDomain: "mikezxcs-55fb3.firebaseapp.com",
-  projectId: "mikezxcs-55fb3",
-  storageBucket: "mikezxcs-55fb3.appspot.com",
-  messagingSenderId: "863982717964",
-  appId: "1:863982717964:web:ab93b29ef263591a267229",
-  measurementId: "G-Z2GGEQMT0W"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const firestore = getFirestore(app);
+import { db } from "../context/firebaseconfig";
 
 const Analytics = () => {
 
@@ -61,7 +48,7 @@ const Analytics = () => {
     };
 
     useEffect(() => {
-      const unsubscribe = onSnapshot(doc(collection(firestore, 'counter'), 'pendingtask'), (doc) => {
+      const unsubscribe = onSnapshot(doc(collection(db, 'counter'), 'pendingtask'), (doc) => {
         const data = doc.data();
         setPendingTask(data.count);
       });
@@ -70,16 +57,15 @@ const Analytics = () => {
     }, []);
 
     useEffect(() => {
-      const unsubscribe = onSnapshot(doc(collection(firestore, 'counter'), 'completedtask'), (doc) => {
+      const unsubscribe = onSnapshot(doc(collection(db, 'counter'), 'completedtask'), (doc) => {
         const data = doc.data();
         setCompletedTaskValue(data.count);
       });
-    
+
       return () => unsubscribe();
     }, []);
-
   
-  const unsubscribe = onSnapshot(doc(collection(firestore, 'counter'), 'totaltask'), (doc) => {
+  const unsubscribe = onSnapshot(doc(collection(db, 'counter'), 'totaltask'), (doc) => {
     const data = doc.data();    
     setTotalTaskValue(data.count);
           // Calculate the completion rate
@@ -139,7 +125,7 @@ const Analytics = () => {
   }, [completedTask]);
 
   const fetchTasks = async () => {
-    const tasksQuery = query(collection(firestore, 'user'));
+    const tasksQuery = query(collection(db, 'user'));
     const snapshot = await getDocs(tasksQuery);
     const fetchedTasks = snapshot.docs.map(doc => ({
       name: doc.data().name,
@@ -167,12 +153,12 @@ const Analytics = () => {
   };
 
   return (
-    <div className='bg-[#fdf5e6] h-screen flex items-center py-[200px] px-[40px] overflow-hidden '>
-        <div className='bg-[#f5fffa] items-center flex-col py-[20px] px-[20px] gap-[15px] rounded-[30px] h-[600px] w-[1100px] shadow-lg absolute left-[400px] '>
+    <div className=''>
+        <div className=' '>
         </div>
-        <div className='bg-[#f5fffa] items-center flex-col py-[20px] px-[15px] gap-[15px] rounded-[10px] h-[70px] w-[200px] absolute left-[1300px] top-[45px]'>
+        {/* <div className='bg-[#f5fffa] flex-col py-[20px] px-[15px] gap-[15px] rounded-[10px] h-[70px] w-[200px] absolute left-[1300px] top-[45px]'>
             <h1 className='text-[20px] leading-[25px] font-extrabold'>TASK OVERVIEW</h1>
-        </div>
+        </div> */}
         <div className='bg-[#fff8dc] flex-col py-[40px] px-[30px] gap-[15px] rounded-[20px] h-[30px] w-[450px] shadow-inner absolute left-[500px] top-[100px] '>
           <h1 className='text-[50px] leading-[1px] px-[300px] leading-[1px]'>{completedTaskValue}</h1>
           <h1 className='text-[30px] leading-[9px]'>Completed Task</h1>  
@@ -195,39 +181,40 @@ const Analytics = () => {
           </ul>
         ))}
         </div>
-        <div className='bg-[#fff8dc] flex-col py-[40px] px-[30px] gap-[15px] rounded-[20px] h-[230px] w-[300px] shadow-inner absolute left-[1150px] top-[440px] '>
-          <h1 className='text-[20px] leading-[9px]'>Completion Rate </h1>
-          <div className="circular-progress" style={{ position: "relative", width: "400px", height: "400px" }}>
-            <svg width="400" height="400">
-              <circle
-                cx="50"
-                cy="50"
-                r="60"
-                fill="none"
-                stroke="#ddd"
-                strokeWidth="8"
-              />
-              <circle
-                cx="50"
-                cy="50"
-                r="60"
-                fill="none"
-                stroke="#4caf50"
-                strokeWidth="8"
-                strokeDasharray={`${completedTaskRate * 360}, 360`}
-                transform="rotate(-90 50 50)"
-              />
-              <text x="50" y="55" textAnchor="middle" fontSize="16" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-                {Math.round(completedTaskRate * 100)}%
-              </text>
-            </svg>
-            {showFeedback && (
-            <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", background: "white", padding: "5px", border: "1px solid #ccc", borderRadius: "5px", boxShadow: "0 2px 5px rgba(0,0,0,0.2)" }}>
-              {feedbackMessage}
-            </div>
-          )}
+        <div className='bg-[#fff8dc] flex-col py-[40px] px-[30px] gap-[15px] rounded-[20px] h-[200px] w-[300px] shadow-inner absolute left-[1150px] top-[440px]'>
+        <h1 className='text-[20px] leading-[9px] m-1'>Completion Rate</h1>
+        <div className="circular-progress" style={{ position: "relative", width: "100px", height: "100px" }}>
+      <svg className="circle" width="500" height="500 ">
+        <circle
+          cx="50"
+          cy="50"
+          r="40"
+          fill="none"
+          stroke="#ddd"
+          strokeWidth="8"
+        />
+        <circle
+          cx="50"
+          cy="50"
+          r="40"
+          fill="none"
+          stroke="#4caf50"
+          strokeWidth="8"
+          strokeDasharray={`${completedTaskRate * 360}, 360`}
+          transform="rotate(-90 50 50)"
+        />
+        <text x="50" y="55" textAnchor="middle" fontSize="16" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+          {Math.round(completedTaskRate * 100)}%
+        </text>
+      </svg>
+      {showFeedback && (
+        <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", background: "white", height: "50px", width: "200px", padding: "5px", border: "1px solid #ccc", borderRadius: "5px", boxShadow: "0 2px 5px rgba(0,0,0,0.2)" }}>
+          {feedbackMessage}
         </div>
-      </div>   
+      )}
+    </div>
+        </div>
+        
     </div>
   )
 }

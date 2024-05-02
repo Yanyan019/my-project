@@ -8,13 +8,16 @@ import {
   addDoc,
   deleteDoc,
   doc,
+  updateDoc,
+  count,
+  FieldValue,
+  increment
 } from "firebase/firestore";
 import { Modal } from "flowbite-react";
-import { RiDeleteBin6Line } from "react-icons/ri";
+import { RiDeleteBin6Line, RiCheckLine} from "react-icons/ri";
 /* import { FaRegEdit } from "react-icons/fa"; */
 import { IoIosAdd } from "react-icons/io";
-import TextField from '@mui/material/TextField';
-import Box from '@mui/material/Box';
+import {TextField, Box} from '@mui/material';
 
 function Task() {
   const [newName, setNewName] = useState("");
@@ -25,6 +28,10 @@ function Task() {
 
   const [users, setUsers] = useState([]);
   const usersCollectionRef = collection(db, "users");
+  const usersCollectionRefCount = doc(db, 'counter', 'pendingtask');
+  const usersCollectionRefComplete = doc(db, 'counter', 'completedtask');
+
+  const usersCollectionRefTotal = doc(db, 'counter', 'totaltask');
 
   const [openModal, setOpenModal] = useState(true);
 
@@ -54,7 +61,15 @@ function Task() {
       ...users,
       { eventName: newName, eventDesc: newDesc, eventDate: newDate },
     ]);
-    // Clear input fields after creation
+
+    updateDoc(usersCollectionRefCount, {
+      count:increment(1)
+    })
+
+    updateDoc(usersCollectionRefTotal, {
+      count:increment(1)
+    })
+    
     setNewName("");
     setNewDesc("");
     setNewDate("");
@@ -68,11 +83,34 @@ function Task() {
     const confirmed = window.confirm(
       "Are you sure you want to delete this task?"
     );
+    
 
     if (confirmed) {
       await deleteDoc(doc(db, "users", id));
       setUsers(users.filter((user) => user.id !== id));
+      updateDoc(usersCollectionRefCount, {
+        count:increment(-1)
+      })
       window.alert("Task deleted successfully!");
+    }
+  };
+
+  const completeUser = async (id) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this task?"
+    );
+    
+
+    if (confirmed) {
+      await deleteDoc(doc(db, "users", id));
+      setUsers(users.filter((user) => user.id !== id));
+      updateDoc(usersCollectionRefComplete, {
+        count:increment(1)
+      })
+      updateDoc(usersCollectionRefCount, {
+        count:increment(-1)
+      })
+      window.alert("Task completed successfully!");
     }
   };
 
@@ -206,15 +244,21 @@ function Task() {
               <th></th>
             </tr>
           </thead>
+          
           <tbody>
             {users.map((user) => (
               <tr key={user.id}>
                 <td>{user.eventName}</td>
                 <td>{user.eventDesc}</td>
-                <td>{user.eventDate}</td>
+               <td>{user.eventDate}</td>
                 <td>
                   <button onClick={() => deleteUser(user.id)}className="delete-button">
                   <RiDeleteBin6Line />
+                  </button>
+                </td>
+                <td>
+                  <button onClick={() => completeUser(user.id)}className="delete-button">
+                  <RiCheckLine />
                   </button>
                 </td>
               </tr>
