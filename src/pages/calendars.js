@@ -5,7 +5,9 @@ import PreviousIcon from './PreviousIcon'; // Import SVG icon for previous month
 import NextIcon from './NextIcon'; // Import SVG icon for next month
 /* import { useSession, useSupabaseClient, useSessionContext } from '@supabase/auth-helpers-react'; */
 import { Datepicker } from "flowbite-react";
-import { Button, Modal } from "flowbite-react";
+import {  Modal } from "flowbite-react";
+import {  FaPlus } from "react-icons/fa6";
+import TextField from '@mui/material/TextField';
 
 const Calendar = () => {
     const [ selectedDate, setSelectedDate ] = useState(new Date());
@@ -167,39 +169,29 @@ const Calendar = () => {
           {renderHeader()}
           {renderDaysOfWeek()}
           {renderCells()}
-
           {/* Event form */}
             <div className="event-form">
             <div >
           <>
             <div className="event-form-container">
-                <button onClick={() => setOpenModal(true)}>Create Events</button>
+                <button onClick={() => setOpenModal(true)}><FaPlus /></button>
                 <Modal show={openModal} onClose={() => setOpenModal(false)}>
-                <Modal.Header>Create Events</Modal.Header>
-                <Modal.Body>
-
+                <Modal.Header style={{backgroundColor:'#f1e092', borderBottom:'1px solid black'}}>Create Events</Modal.Header>
+                <Modal.Body style={{backgroundColor:'#f1e092', color:'#15161a'}}>
                 {/* <h2>Hey there {session.user.email}</h2> */}
-
                 <p>Start of your event</p>
-                <Datepicker
-                value={selectedDate}
-                onSelectedDateChanged={handleDateChange}
-                />
-
-                <p>Event name</p>
-                <input type="text" onChange={(e) => seteventName(e.target.value)} />
-                <p>Event description</p>
-                <input type="text" onChange={(e) => seteventDescription(e.target.value)} />
-                <hr />
+                <Datepicker value={selectedDate} onSelectedDateChanged={handleDateChange} />
+                <TextField id="standard-basic" label="Event Name" variant="standard" onChange={(e) => seteventName(e.target.value)} />
+                <TextField id="standard-basic" label="Event Description" variant="standard" onChange={(e) => seteventDescription(e.target.value)} />
                 </Modal.Body>
-                <Modal.Footer>
-                <Button /* onClick={() => createCalendarEvent()} */>Create Calendar Event</Button>
-                <Button color="gray" onClick={() => setOpenModal(false)}>Cancel</Button>
+                <Modal.Footer style={{backgroundColor:'#f1e092', borderTop:'1px solid black'}}>
+                  <div className='button-footers' style={{display:'flex', gap:'1rem'}}>
+                    <button /* onClick={() => createCalendarEvent()} */ >Create Event</button>
+                    <button onClick={() => setOpenModal(false)} >Cancel</button>
+                  </div>
                 </Modal.Footer>
                 </Modal>  
-
             </div>
-            {/* <button onClick={() => googleSignIn()}>Sign In With Google</button> */}
           </>
       </div>
             </div>

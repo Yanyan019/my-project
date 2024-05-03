@@ -11,6 +11,8 @@ import Task from './pages/Task';
 import Theme from './pages/theme';
 import Calendars  from './pages/calendars';
 import Analytics from './pages/analytics';
+//THEME
+
  
 const App = () => {
   const {user} = useAuth();

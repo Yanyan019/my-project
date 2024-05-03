@@ -56,7 +56,7 @@ const Navbar = () => {
             </Link>
           </li>
           <li>
-            <Link to='' className='nav-link'>
+            <Link to='' className='nav-link' onClick={handleLogout}>
             <span className='buton'><IoIosLogOut className='icon'/>Logout</span>
             </Link>
           </li>
