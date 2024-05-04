@@ -1,132 +1,118 @@
 import "./Task.css";
 import React, { useState, useEffect } from "react";
-import { db } from "../context/firebaseconfig";
-import {
-  collection,
-  getDocs,
-  addDoc,
-  deleteDoc,
-  doc,
-} from "firebase/firestore";
+
+/* REALTIME DATABASE */
+import app from "../context/firebaseconfig";
+import { getDatabase, ref, set, push, onValue, remove, update} from "firebase/database";
+
+//COMPONENTS AND ICONS
 import { Modal } from "flowbite-react";
 import { RiDeleteBin6Line/* ,RiCheckLine  */} from "react-icons/ri";
 /* import { FaRegEdit } from "react-icons/fa"; */
 import { IoIosAdd } from "react-icons/io";
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
-
+import { MdOutlineDone } from "react-icons/md";
+import { CiEdit } from "react-icons/ci";
 
 function Task() {
-  const [newName, setNewName] = useState("");
-  const [newDesc, setNewDesc] = useState("");
-  const [newDate, setNewDate] = useState("");
-  const [newPriority, setNewPriority] = useState("");
-  const [newCategory, setNewCategory] = useState("");
+  let [inputValue1, setInputValue1] = useState("");// EVENT NAME
+  let [inputValue2, setInputValue2] = useState("");// EVENT DESCRIPTION
+  let [inputValue3, setInputValue3] = useState(new Date());// EVENT DATE
 
-  const [permission, setPermission] = useState("defalut");
+  const [newPriority, setNewPriority] = useState("");// EVENT PRIORITY
+  const [newCategory, setNewCategory] = useState("");// EVENT CATEGORY
 
-  const [users, setUsers] = useState([]);
-  const usersCollectionRef = collection(db, "users");
-
-  /* const usersCollectionRefCount = doc(db, 'counter', 'pendingtask');
-  const usersCollectionRefComplete = doc(db, 'counter', 'completedtask');
-
-  const usersCollectionRefTotal = doc(db, 'counter', 'totaltask'); */
+  const [tasks, setTasks] = useState([]);// PARA SA PAGOUTPUT NG TASK
 
   const [openModal, setOpenModal] = useState(true);
 
-  const [categories] = useState([
-    "Work",
-    "Health",
-    "Academics",
-    "Personal",
-  ]);
+  const [editMode, setEditMode] = useState(false);
+  const [editTaskId, setEditTaskId] = useState(null);
 
-  useEffect(() => {
-    const getUsers = async () => {
-      const data = await getDocs(usersCollectionRef);
-      setUsers(
-        data.docs.map((doc) => ({
-          id: doc.id,
-          eventName: doc.data().name,
-          eventDesc: doc.data().description,
-          eventDate: doc.data().date,
-          eventPriority: doc.data().priority,
-          eventCategory: doc.data().category,
-        }))
-      );
-    };
+  const [categories] = useState([ "Work", "Health", "Academics", "Personal", ]);
 
-    getUsers();
-  }, [usersCollectionRef]);
-
-  const createUser = async () => {
-    await addDoc(usersCollectionRef, {
-      name: newName,
-      description: newDesc,
-      date: newDate,
-      priority: newPriority,
-      category: newCategory,
-    });
-    setUsers([
-      ...users,
-      { eventName: newName, eventDesc: newDesc, eventDate: newDate, eventPriority: newPriority, eventCategory: newCategory},
-    ]);
-
-    /* updateDoc(usersCollectionRefCount, {
-      count:increment(1)
-    })
-
-    updateDoc(usersCollectionRefTotal, {
-      count:increment(1)
-    }) */
-
-    // Clear input fields after creation
-    setNewName("");
-    setNewDesc("");
-    setNewDate("");
+  const clearForm = () => {
+    setInputValue1("");
+    setInputValue2("");
+    setInputValue3(new Date());
     setNewPriority("");
     setNewCategory("");
-    setOpenModal(false);
-    window.alert("Task created successfully!");
   };
 
-  const deleteUser = async (id) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this task?"
-    );
+  /* PARA MALAMAN KUNG NAG SAVE NABA AT MAG SAVE SA DATABASE */
+  const saveData = async () => {
+    const db = getDatabase(app);
+    const newDocRef = push(ref(db, "users/tasks"));
+    const deadlineDateTime = new Date(inputValue3).getTime(); // Convert deadline to timestamp
+    set(newDocRef, {
+      eventName: inputValue1,
+      eventDescription: inputValue2,
+      eventDate: inputValue3,
+      eventPriority: newPriority,
+      eventCategory: newCategory,
+      deadline: deadlineDateTime // Save deadline as timestamp
+    }).then(() => {
+      alert("Data saved successfully");
+      scheduleNotification(deadlineDateTime); // Schedule notification for deadline
+    }).catch((error) => {
+      alert("Error: " + error.message);
+    });
+  };
 
-    if (confirmed) {
-      await deleteDoc(doc(db, "users", id));
-      setUsers(users.filter((user) => user.id !== id));
-      /* updateDoc(usersCollectionRefCount, {
-        count:increment(-1)
-      }) */
-      window.alert("Task deleted successfully!");
+  const scheduleNotification = (eventDate) => {
+    const deadlineTime = new Date(eventDate);
+    const currentTime = new Date();
+    const timeUntilDeadline = deadlineTime.getTime() - currentTime.getTime();
+
+    if (timeUntilDeadline > 0) {
+      setTimeout(() => {
+        showNotification(`Task Deadline Reminder: ${inputValue1}`);
+      }, timeUntilDeadline);
     }
   };
 
-  /* const completeUser = async (id) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this task?"
-    );
-
-
-    if (confirmed) {
-      await deleteDoc(doc(db, "users", id));
-      setUsers(users.filter((user) => user.id !== id));
-      updateDoc(usersCollectionRefComplete, {
-        count:increment(1)
-      })
-      updateDoc(usersCollectionRefCount, {
-        count:increment(-1)
-      })
-      window.alert("Task completed successfully!");
+  /* PARA MAKITA KUNG LUMAGPAS KANA SA DEADLINE */
+  const showNotification = (message) => {
+    if (Notification.permission === "granted") {
+      new Notification("Task Deadline Reminder", { body: message });
+    } else if (Notification.permission !== "denied") {
+      Notification.requestPermission().then((permission) => {
+        if (permission === "granted") {
+          new Notification("Task Deadline Reminder", { body: message });
+        }
+      });
     }
-  }; */
+  };
+    /* PAGSASAVE NG TASK REKTA SA REALTIME DATABASE */
+  const handleTaskCompletion = () => {
+    const db = getDatabase(app);
+    const newDocRef = push(ref(db, "completedTasks"));
+    // Assuming you have a way to identify the task to mark as completed
+    const completedTaskData = {
+      eventName: inputValue1,
+      eventDescription: inputValue2,
+      eventDate: inputValue3,
+      eventPriority: newPriority,
+      eventCategory: newCategory,
+      completionDate: new Date().toISOString() // Save completion date
+    };
+    set(newDocRef, completedTaskData)
+      .then(() => {
+        alert("Task marked as completed");
+        notifyTaskCompletion(inputValue1); // Trigger completion notification
+      })
+      .catch((error) => {
+        alert("Error marking task as completed: " + error.message);
+      });
+  };
 
+  const notifyTaskCompletion = (taskName) => {
+    const message = `Task "${taskName}" has been completed!`; // PARA MALAMAN KUNG TAPOS NABA ANG TASK
+    showNotification(message);
+  };
 
-  // Function to get color based on priority
+  /* PARA SA KULAY NG MGA PRIORITY */
   const getPriorityColor = (priority) => {
     switch (priority) {
       case "high-priority":
@@ -142,72 +128,72 @@ function Task() {
     }
   };
 
-  /*     const markTaskAsDone = (task) => {
-      task.completed = true;
-      setCompletedTasks([...completedTasks, task]);
-      setTasks(tasks.filter((t) => t !== task));
-    };
-  
-    const markTaskAsUndone = (task) => {
-      task.completed = false;
-      setTasks([...tasks, task]);
-      setCompletedTasks(completedTasks.filter((t) => t !== task));
-    };
-  
-    const handleRemoveTask = (task) => {
-      if (!task.completed) {
-        setTasks(tasks.filter((t) => t !== task));
+  /* PAGKUHA NG DATA SA REALTIME DATABASE */
+  useEffect(() => {
+    const db = getDatabase(app);
+    const tasksRef = ref(db, 'users/tasks');
+    onValue(tasksRef, (snapshot) => {
+      const tasksData = snapshot.val();
+      if (tasksData) {
+        const tasksArray = Object.entries(tasksData).map(([key, value]) => ({
+          id: key, // Include the task ID
+          ...value // Include other task data
+        }));
+        setTasks(tasksArray);
       } else {
-        setCompletedTasks(completedTasks.filter((t) => t !== task));
+        setTasks([]);
       }
-    }; */
+    });
+  }, []);
 
 
-    /* NOTIFICATION */
-    useEffect(() => {
-      if (Notification.permission !== "granted") {
-        Notification.requestPermission().then((perm) => {
-          // Handle permission request result if needed
-          setPermission(perm);
-        });
-      } else {
-        setPermission(Notification.permission);
-      }
-    }, []);
-  
-    useEffect(() => {
-      users.forEach((task) => {
-        if (task.eventDate && permission === "granted" && !task.notificationSent) {
-          const deadline = new Date(task.eventDate);
-          // Calculate the time difference in milliseconds between the current time and the deadline
-          const timeDifference = deadline.getTime() - Date.now();
-          if (timeDifference > 0) {
-            // Schedule the notification to appear at the deadline
-            const notificationTimer = setTimeout(() => {
-              const notificationOptions = {
-                title: `Task '${task.eventName}' is past its deadline`,
-                body: `Deadline: ${task.eventDate}`,
-              };
-              // Check if the browser supports notifications
-              if ('Notification' in window) {
-                // Request permission if not granted
-                if (Notification.permission === "granted") {
-                  new Notification(notificationOptions.title, notificationOptions);
-                }
-              }
-              // Update task with notification sent flag
-              const updatedTask = { ...task, notificationSent: true };
-              setUsers(users.map((user) => (user.id === task.id ? updatedTask : user)));
-            }, timeDifference);
-            // Store the timer ID for cleanup when component unmounts
-            return () => clearTimeout(notificationTimer);
-          }
-        }
+  const handleTaskDelete = (taskId) => {
+    const db = getDatabase(app);
+    const taskRef = ref(db, `users/tasks/${taskId}`);
+    remove(taskRef)
+      .then(() => {
+        alert("Task deleted successfully");
+      })
+      .catch((error) => {
+        alert("Error deleting task: " + error.message);
       });
-    }, [users, permission]);
+  };
+  
+  const handleTaskEdit = (taskId) => {
+        const taskToEdit = tasks.find(task => task.id === taskId);
+        if (taskToEdit) {
+          setInputValue1(taskToEdit.eventName);
+          setInputValue2(taskToEdit.eventDescription);
+          setInputValue3(taskToEdit.eventDate);
+          setNewPriority(taskToEdit.eventPriority);
+          setNewCategory(taskToEdit.eventCategory);
+          setEditMode(true);
+          setEditTaskId(taskId);
+          setOpenModal(true);
+        }
+      };
     
-    
-
+      const updateTask = async () => {
+        const db = getDatabase(app);
+        const taskRef = ref(db, `users/tasks/${editTaskId}`);
+        const deadlineDateTime = new Date(inputValue3).getTime();
+        update(taskRef, {
+          eventName: inputValue1,
+          eventDescription: inputValue2,
+          eventDate: inputValue3,
+          eventPriority: newPriority,
+          eventCategory: newCategory,
+          deadline: deadlineDateTime
+        }).then(() => {
+          alert("Task updated successfully");
+          setOpenModal(false);
+          setEditMode(false);
+          setEditTaskId(null);
+          clearForm();
+        }).catch((error) => {
+          alert("Error updating task: " + error.message);
+        });
+      };
 
 
   return (
@@ -223,57 +209,59 @@ function Task() {
         <Modal dismissible show={openModal} onClose={() => setOpenModal(false)}>
           <Modal.Header style={{backgroundColor:'#f1e092', borderBottom:'1px solid black'}}>Create Task</Modal.Header>
           <div className="toggle-list" style={{backgroundColor:'#f1e092'}}>
+
             <div className="input-user">
               <Box component="form" sx={{ '& > :not(style)': {  width: '100%' }, }} noValidate autoComplete="off">
                 <div className="textfield">
-                  <TextField id="standard-basic" label="Title" variant="standard"  value={newName} onChange={(e) => setNewName(e.target.value)} style={{borderBottom:'1px solid black'}}/>
-                  <TextField id="standard-basic" label="Description" variant="standard" value={newDesc} onChange={(e) => setNewDesc(e.target.value)} style={{borderBottom:'1px solid black',backgroundColor:'#f1e092', outline:'none',boxShadow:'none',marginLeft:'20px'}}/>
+                  <TextField id="standard-basic" label="Title" variant="standard" value={inputValue1} onChange={(e) => setInputValue1(e.target.value)}/>
+                  <TextField id="standard-basic" label="Description" variant="standard" value={inputValue2} onChange={(e) => setInputValue2(e.target.value)}/>
+                  <input type='datetime-local' value={inputValue3} onChange={(e) => setInputValue3(e.target.value)}/>
                 </div>
               </Box>
-              <input type="datetime-local" value={newDate} onChange={(e) => setNewDate(e.target.value)} style={{backgroundColor:'#f1e092', outline:'none',boxShadow:'none'}}/>
             </div>
             
         <fieldset>
           <div className="radio-group">
             <h1>Priority:</h1>
-            <label>
-              <input type="radio" value="no-priority" checked={newPriority === "no-priority"} onChange={(e) => setNewPriority(e.target.value)} style={{marginRight:'10px'}}/>
-              <span style={{ color: getPriorityColor("no-priority") }}>No Priority</span>
-            </label>
-            <label>
-              <input type="radio" value="low-priority" checked={newPriority === "low-priority"} onChange={(e) => setNewPriority(e.target.value)} style={{marginRight:'10px'}}/>
-              <span style={{ color: getPriorityColor("low-priority") }}>Low Priority</span>
-            </label>
-            <label>
-              <input type="radio" value="medium-priority" checked={newPriority === "medium-priority"} onChange={(e) => setNewPriority(e.target.value)} style={{marginRight:'10px'}}/>
-              <span style={{ color: getPriorityColor("medium-priority") }}>Medium Priority</span>
-            </label>
-            <label>
-              <input type="radio" value="high-priority" checked={newPriority === "high-priority"} onChange={(e) => setNewPriority(e.target.value)} style={{marginRight:'10px'}}/>
-              <span style={{ color: getPriorityColor("high-priority") }}>High Priority</span>
-            </label>
+            {["no-priority", "low-priority", "medium-priority", "high-priority"].map((priority) => (
+          <label key={priority}>
+            <input
+              type="radio"
+              value={priority}
+              checked={newPriority === priority}
+              onChange={(e) => setNewPriority(e.target.value)}
+              style={{ marginRight: '10px' }}
+            />
+            <span style={{ color: getPriorityColor(priority) }}>{priority}</span>
+          </label>
+        ))}
           </div>
         </fieldset>
             <fieldset>
               <div className="radio-group">
                 <h1>Category:</h1>
                 {categories.map((cat) => (
-                  <label key={cat}>
-                    <input type="radio" value={cat} checked={newCategory === cat}onChange={() => setNewCategory(cat)} style={{marginRight:'10px'}}/>
-                    {cat}
-                  </label>
-                ))}
+                <label key={cat}>
+                  <input type="radio" value={cat} checked={newCategory === cat} onChange={() => setNewCategory(cat)} style={{ marginRight: '10px' }} />
+                  {cat}
+                </label>
+              ))}
               </div>
             </fieldset>
           </div>
           <Modal.Footer style={{backgroundColor:'#f1e092', borderTop:'1px solid black'}}>
             <div className="button-footer" style={{display:"flex",gap:"1rem"}}>
-              <button onClick={createUser}>Submit</button>
+              {editMode ? (
+                <button onClick={updateTask}>Update Task</button>
+              ) : (
+                <button onClick={saveData}>Save Data</button>
+              )}
               <button onClick={() => setOpenModal(false)}>Cancel</button>
             </div>
           </Modal.Footer>
         </Modal>
       </div>
+
       {/* OUTPUT TASK LIST - MAKIKITA SA LABAS NG MODAL*/}
       <div className="userlist">
         <table className="task-table">
@@ -287,23 +275,23 @@ function Task() {
             </tr>
           </thead>
           <tbody className="list-body">
-            {users.map((user) => (
-              <tr key={user.id}>
-                <td>{user.eventName}</td>
-                <td>{user.eventDesc}</td>
-                <td>{user.eventDate}</td>
-                <td>{user.eventPriority}</td>
-                <td>{user.eventCategory}</td>
-                <td>
-                  <button onClick={() => deleteUser(user.id)}className="delete-button">
-                  <RiDeleteBin6Line />
+            {tasks.map((task, index) => (
+              <tr key={index}>
+                <td>{task.eventName}</td>
+                <td>{task.eventDescription}</td>
+                {task.eventDate && <span>{new Date(task.deadline).toLocaleString()}</span>}
+                <td>{task.eventPriority}</td>
+                <td>{task.eventCategory}</td>
+                {/* Additional task details based on your data structure */}
+                <div>
+                  <button onClick={handleTaskCompletion}><MdOutlineDone /></button>
+                  <button onClick={() => handleTaskDelete(task.id)}>
+                    <RiDeleteBin6Line/>
                   </button>
-                </td>
-               {/*  <td>
-                  <button onClick={() => completeUser(user.id)}className="delete-button">
-                  <RiCheckLine />
+                  <button onClick={() => handleTaskEdit(task.id)}>
+                    <CiEdit />
                   </button>
-                </td> */}
+                </div>
               </tr>
             ))}
           </tbody>

@@ -95,7 +95,6 @@
   
   /* Event Form */
   .event-form {
-    border-radius: 8px;
     display: flex;
     float: right;
     margin-top: 50px;
@@ -113,12 +112,6 @@
   .event-form button {
     border: 1px solid #ccc;
     box-sizing: border-box;
-  }
-  
-  .event-form input[type="text"]:focus {
-    outline: none;
-    border-color: #000000;
-    box-shadow: 0 0 5px rgba(6, 6, 6, 0.5);
   }
   
   .event-form button {
@@ -156,6 +149,14 @@
     border: 1px solid black;
     background-color: #ff7377;
   }
+
+  .body{
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+  }
+
+
   
   /* Responsive adjustments */
   @media (max-width: 768px) {
