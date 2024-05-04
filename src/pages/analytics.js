@@ -1,11 +1,8 @@
 import React,  { useState, useEffect } from 'react'
 import Chart from 'chart.js/auto';
-
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore, collection, doc, onSnapshot, query, getDocs} from 'firebase/firestore';
-
 import { db } from "../context/firebaseconfig";
 
 const Analytics = () => {
@@ -52,7 +49,7 @@ const Analytics = () => {
         const data = doc.data();
         setPendingTask(data.count);
       });
-    
+   
       return () => unsubscribe();
     }, []);
 
@@ -64,7 +61,7 @@ const Analytics = () => {
 
       return () => unsubscribe();
     }, []);
-  
+ 
   const unsubscribe = onSnapshot(doc(collection(db, 'counter'), 'totaltask'), (doc) => {
     const data = doc.data();    
     setTotalTaskValue(data.count);
@@ -73,15 +70,15 @@ const Analytics = () => {
           setCompletedTaskRate(completedTaskValue / data.count);
       }      
   });
-    
-    
+   
+   
 
-  // isang beses magrurun 
+  // isang beses magrurun
   useEffect(() => {
     const ctx = document.getElementById('myChart').getContext('2d');
     const labels = completedTask.map(item => item.day);
     const data = completedTask.map(item => item.count);
-  
+ 
     const existingChart = Chart.getChart('myChart');
       if (existingChart) {
         existingChart.destroy(); // Destroy the existing chart
@@ -135,7 +132,7 @@ const Analytics = () => {
     }));
     setTask(fetchedTasks);
   };
-  
+ 
   fetchTasks();
 
   const filterTasks = (type) => {
@@ -214,7 +211,7 @@ const Analytics = () => {
       )}
     </div>
         </div>
-        
+       
     </div>
   )
 }
