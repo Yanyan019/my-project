@@ -1,9 +1,8 @@
 import React,  { useState, useEffect } from 'react'
 import Chart from 'chart.js/auto';
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-import { getFirestore, collection, doc, onSnapshot, query, getDocs} from 'firebase/firestore';
-import { db } from "../context/firebaseconfig";
+import { onValue, ref } from 'firebase/database';
+import { getDatabase } from "firebase/database";
+import { auth } from "../context/firebaseconfig";
 
 const Analytics = () => {
 
@@ -14,13 +13,13 @@ const Analytics = () => {
   const [feedbackMessage, setFeedbackMessage] = useState("");
   const [totalTaskValue, setTotalTaskValue] = useState();
   const [completedTask, setCompletedTask] = useState([
-    { day: "Sunday", count: 5 },
-    { day: "Monday", count: 2 },
-    { day: "Tuesday", count: 4 },
-    { day: "Wednesday", count: 2 },
-    { day: "Thursday", count: 1 },
-    { day: "Friday", count: 2 },
-    { day: "Saturday", count: 3 },
+    { day: "Sunday", count: 0 },
+    { day: "Monday", count: 0 },
+    { day: "Tuesday", count: 0 },
+    { day: "Wednesday", count: 0 },
+    { day: "Thursday", count: 0 },
+    { day: "Friday", count: 0 },
+    { day: "Saturday", count: 0 },
   ]);
 
   const [task, setTask] = useState([])
@@ -44,35 +43,102 @@ const Analytics = () => {
     };
 
     useEffect(() => {
-        const pendingTaskUnsubscribe = onSnapshot(doc(collection(db, 'counter'), 'pendingtask'), (doc) => {
-            setPendingTask(doc.data().count);
-          });
-   
-      return () => unsubscribe();
+        const db = getDatabase();
+        const pendingTaskRef = ref(db, 'users/counter/pendingtask');
+        const pendingTaskUnsubscribe = onValue(pendingTaskRef, (snapshot) => {
+            const data = snapshot.val();
+            setPendingTask(data.count);
+        });
+    
+        return () => {
+            pendingTaskUnsubscribe();
+        };
     }, []);
 
     useEffect(() => {
-        const completedTaskUnsubscribe = onSnapshot(doc(collection(db, 'counter'), 'completedtask'), (doc) => {
-            setCompletedTaskValue(doc.data().count);
-          });
-
-      return () => unsubscribe();
+        const db = getDatabase();
+        const completedTaskRef = ref(db, 'users/counter/completedtask');
+        const completedTaskUnsubscribe = onValue(completedTaskRef, (snapshot) => {
+            const data = snapshot.val();
+            setCompletedTaskValue(data.count);
+        });
+    
+        return () => {
+            completedTaskUnsubscribe();
+        };
     }, []);
  
-  const unsubscribe = onSnapshot(doc(collection(db, 'counter'), 'totaltask'), (doc) => {
-    const data = doc.data();    
-    setTotalTaskValue(data.count);
-          // Calculate the completion rate
-      if (data.count > 0) {
-          setCompletedTaskRate(completedTaskValue / data.count);
-      }      
-  });
+    useEffect(() => {
+        const db = getDatabase();
+        const totalTaskRef = ref(db, 'users/counter/totaltask');
+        const unsubscribe = onValue(totalTaskRef, (snapshot) => {
+            const data = snapshot.val();
+            setTotalTaskValue(data.count);
+            // Calculate the completion rate
+            if (data.count > 0) {
+                setCompletedTaskRate(completedTaskValue / data.count);
+            }
+        });
+    
+        return () => {
+            unsubscribe();
+        };
+    }, [completedTaskValue]);
    
    
-
   // isang beses magrurun
   useEffect(() => {
     const ctx = document.getElementById('myChart').getContext('2d');
+    let date = new Date();
+    let dayToday;
+    switch(date.getDay()){
+        case 0: 
+            dayToday = "Sunday";
+            break; 
+        case 1: 
+            dayToday = "Monday";
+            break; 
+        case 2: 
+            dayToday = "Tuesday";
+            break; 
+        case 3: 
+            dayToday = "Wednesday";
+            break; 
+        case 4: 
+            dayToday = "Thursday";
+            break; 
+        case 5: 
+            dayToday = "Friday";
+            break; 
+        case 6: 
+            dayToday = "Saturday";
+            break; 
+    }
+    
+    const sunday = completedTask.find(sunday=>sunday.day===dayToday)
+    const monday = completedTask.find(monday=>monday.day===dayToday)
+    const tuesday = completedTask.find(tuesday=>tuesday.day===dayToday)
+    const wednesday = completedTask.find(wednesday=>wednesday.day===dayToday)
+    const thursday = completedTask.find(thursday=>thursday.day===dayToday)
+    const friday = completedTask.find(friday=>friday.day===dayToday)
+    const saturday = completedTask.find(saturday=>saturday.day===dayToday)
+    
+    if (sunday)
+        console.log( sunday.count=completedTaskValue)
+   
+    else if (monday)
+        monday.count=completedTaskValue;
+    else if (tuesday)
+        tuesday.count=completedTaskValue;
+    else if (wednesday)
+        wednesday.count=completedTaskValue;
+    else if (thursday)
+        thursday.count=completedTaskValue;
+    else if (friday)
+        friday.count=completedTaskValue;
+    else if (saturday)
+        saturday.count=completedTaskValue;
+
     const labels = completedTask.map(item => item.day);
     const data = completedTask.map(item => item.count);
   
@@ -118,19 +184,35 @@ const Analytics = () => {
     });
   }, [completedTask]); 
 
-  const fetchTasks = async () => {
-    const tasksQuery = query(collection(db, 'user'));
-    const snapshot = await getDocs(tasksQuery);
-    const fetchedTasks = snapshot.docs.map(doc => ({
-      name: doc.data().name,
-      description: doc.data().description,
-      event: doc.data().event,
-      duedate: doc.data().duedate.toDate() // Assuming dueDate is stored as a Firestore timestamp
-    }));
-    setTask(fetchedTasks);
-  };
- 
-  fetchTasks();
+
+  const fetchTasks = () => {
+    const db = getDatabase();
+    const tasksRef = ref(db, 'users/counter');
+    let fetchedTasks = [];
+
+    const unsubscribe = onValue(tasksRef, (snapshot) => {
+        const data = snapshot.val();
+        for(let id in data){
+            let task = data[id];
+            fetchedTasks.push({
+                name: task.name,
+                description: task.description,
+                event: task.event,
+                duedate: new Date(task.duedate) // Assuming dueDate is stored as a timestamp
+            });
+        }
+        setTask(fetchedTasks);
+    });
+
+    return unsubscribe;
+};
+
+useEffect(() => {
+    const unsubscribe = fetchTasks();
+    return () => {
+        unsubscribe();
+    };
+}, []);
 
   const filterTasks = (type) => {
     const now = new Date();
