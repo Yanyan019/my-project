@@ -31,11 +31,6 @@ const Navbar = () => {
         <ul className='nav'>
           {/* OVERVIEW */}
           <li>
-            <Link to='/' className='nav-link'>
-              <span className='buton'><LuLayoutDashboard className='icon'/>Overview</span>
-            </Link>
-          </li>
-          <li>
             <Link to='/Task' className='nav-link'>
             <span className='buton'><GrTask className='icon'/>My Task</span>
             </Link>

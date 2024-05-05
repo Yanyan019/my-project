@@ -5,7 +5,6 @@ import './App.css';
 import Navbar from './components/navbar';
 //COMPONENTS
 import Signin from './pages/signin';
-import Home from './pages/Home';
 import Task from './pages/Task';
 import Theme from './pages/theme';
 import Calendars  from './pages/calendars';
@@ -23,7 +22,6 @@ const App = () => {
           <div className="app-container">
             <Navbar />
             <Routes>
-              <Route path="/" element={<Home />} />
               <Route path="/Task" element={<Task />} />
               <Route path="/Theme" element={<Theme />} />
               <Route path="/Calendars" element={<Calendars />} />

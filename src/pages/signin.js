@@ -19,7 +19,7 @@ const Signin = () => {
 
   useEffect(() => {
     if (user) {
-      navigate('/Home');
+      navigate('/Task');
     }
   }, [navigate, user]);
 

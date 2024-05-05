@@ -39,11 +39,103 @@ function Task() {
     setNewPriority("");
     setNewCategory("");
   };
+  const [count, setCount] = useState(0);
+  const [completedCount, setCompletedCount] = useState(0);
+  const [totalTaskCount, setTotalTaskCount] = useState(0);
+
+  // Listen for changes in the counter value
+  useEffect(() => {
+    const auth = getDatabase(app);
+    const counterRef = ref(auth,"users/counter/totaltask/count");
+    const unsubscribe = onValue(counterRef, (snapshot) => {
+      setTotalTaskCount(snapshot.val() || 0);
+    });
+
+    // Clean up the listener when the component unmounts
+    return () => unsubscribe();
+  }, []);
+
+  // Increment the counter
+  const totalTaskCounter = () => {
+    const auth = getDatabase(app);
+    const counterRef = ref(auth,"users/counter/totaltask/count")
+    set(counterRef, totalTaskCount + 1);
+  };
+  // Listen for changes in the counter value
+  useEffect(() => {
+    const auth = getDatabase(app);
+    const counterRef = ref(auth,"users/counter/pendingtask/count");
+    const unsubscribe = onValue(counterRef, (snapshot) => {
+      setCount(snapshot.val() || 0);
+    });
+
+    // Clean up the listener when the component unmounts
+    return () => unsubscribe();
+  }, []);
+
+  // Increment the counter
+  const incrementCounter = () => {
+    const auth = getDatabase(app);
+    const counterRef = ref(auth,"users/counter/pendingtask/count")
+    set(counterRef, count + 1);
+  };
+
+  useEffect(() => {
+    const auth = getDatabase(app);
+    const counterRef = ref(auth,"users/counter/completedtask/count");
+    const unsubscribe = onValue(counterRef, (snapshot) => {
+      setCompletedCount(snapshot.val() || 0);
+    });
+
+    // Clean up the listener when the component unmounts
+    return () => unsubscribe();
+  }, []);
+
+  const completedCounter = () => {
+    const auth = getDatabase(app);
+    const counterRef = ref(auth,"users/counter/completedtask/count")
+    set(counterRef, completedCount + 1);
+  };
+
+  useEffect(() => {
+    const auth = getDatabase(app);
+    const counterRef = ref(auth,"users/counter/pendingtask/count");
+    const unsubscribe = onValue(counterRef, (snapshot) => {
+      setCount(snapshot.val() || 0);
+    });
+
+    // Clean up the listener when the component unmounts
+    return () => unsubscribe();
+  }, []);
+
+  const decrementCounter = () => {
+    const auth = getDatabase(app);
+    const counterRef = ref(auth,"users/counter/pendingtask/count")
+    set(counterRef, count - 1);
+  };
+
+  useEffect(() => {
+    const auth = getDatabase(app);
+    const counterRef = ref(auth,"users/counter/totaltask/count");
+    const unsubscribe = onValue(counterRef, (snapshot) => {
+      setTotalTaskCount(snapshot.val() || 0);
+    });
+
+    // Clean up the listener when the component unmounts
+    return () => unsubscribe();
+  }, []);
+
+  const decrementTotalTaskCounter = () => {
+    const auth = getDatabase(app);
+    const counterRef = ref(auth,"users/counter/totaltask/count")
+    set(counterRef, totalTaskCount - 1);
+  };
 
   /* PARA MALAMAN KUNG NAG SAVE NABA AT MAG SAVE SA DATABASE */
   const saveData = async () => {
-    const db = getDatabase(app);
-    const newDocRef = push(ref(db, "users/tasks"));
+    const auth = getDatabase(app);
+    const counterRef = ref(auth,"users/counter/pendingtask/count")
+    const newDocRef = push(ref(auth, "users/tasks"));
     const deadlineDateTime = new Date(inputValue3).getTime(); // Convert deadline to timestamp
     set(newDocRef, {
       eventName: inputValue1,
@@ -54,6 +146,8 @@ function Task() {
       deadline: deadlineDateTime // Save deadline as timestamp
     }).then(() => {
       alert("Data saved successfully");
+      incrementCounter();
+      totalTaskCounter();
       scheduleNotification(deadlineDateTime); // Schedule notification for deadline
     }).catch((error) => {
       alert("Error: " + error.message);
@@ -71,7 +165,6 @@ function Task() {
       }, timeUntilDeadline);
     }
   };
-
   /* PARA MAKITA KUNG LUMAGPAS KANA SA DEADLINE */
   const showNotification = (message) => {
     if (Notification.permission === "granted") {
@@ -84,10 +177,12 @@ function Task() {
       });
     }
   };
+
     /* PAGSASAVE NG TASK REKTA SA REALTIME DATABASE */
-  const handleTaskCompletion = () => {
-    const db = getDatabase(app);
-    const newDocRef = push(ref(db, "completedTasks"));
+    const handleTaskCompletion = (taskId) => {
+      const auth = getDatabase(app);
+      const newDocRef = push(ref(auth, "users/task"));
+      const taskRef = ref(auth, `users/tasks/${taskId}`)
     // Assuming you have a way to identify the task to mark as completed
     const completedTaskData = {
       eventName: inputValue1,
@@ -100,15 +195,21 @@ function Task() {
     set(newDocRef, completedTaskData)
       .then(() => {
         alert("Task marked as completed");
+        console.log(tasks)
+        completedCounter();
+        decrementCounter();
+        decrementTotalTaskCounter();
+        remove(taskRef)
         notifyTaskCompletion(inputValue1); // Trigger completion notification
       })
       .catch((error) => {
         alert("Error marking task as completed: " + error.message);
       });
+      
   };
 
-  const notifyTaskCompletion = (taskName) => {
-    const message = `Task "${taskName}" has been completed!`; // PARA MALAMAN KUNG TAPOS NABA ANG TASK
+  const notifyTaskCompletion = () => {
+    const message = `Task has been completed!`; // PARA MALAMAN KUNG TAPOS NABA ANG TASK
     showNotification(message);
   };
 
@@ -116,22 +217,22 @@ function Task() {
   const getPriorityColor = (priority) => {
     switch (priority) {
       case "high-priority":
-        return "red";
+        return "#4caf50";
       case "medium-priority":
-        return "orange";
+        return "#0000ff";
       case "low-priority":
-        return "green";
+        return "#ff0000";
       case "no-priority":
         return "black";
       default:
-        return "gray";
+        return "black";
     }
   };
 
   /* PAGKUHA NG DATA SA REALTIME DATABASE */
   useEffect(() => {
-    const db = getDatabase(app);
-    const tasksRef = ref(db, 'users/tasks');
+    const auth = getDatabase(app);
+    const tasksRef = ref(auth, 'users/tasks');
     onValue(tasksRef, (snapshot) => {
       const tasksData = snapshot.val();
       if (tasksData) {
@@ -148,8 +249,8 @@ function Task() {
 
 
   const handleTaskDelete = (taskId) => {
-    const db = getDatabase(app);
-    const taskRef = ref(db, `users/tasks/${taskId}`);
+    const auth = getDatabase(app);
+    const taskRef = ref(auth, `users/tasks/${taskId}`);
     remove(taskRef)
       .then(() => {
         alert("Task deleted successfully");
@@ -174,8 +275,8 @@ function Task() {
       };
     
       const updateTask = async () => {
-        const db = getDatabase(app);
-        const taskRef = ref(db, `users/tasks/${editTaskId}`);
+        const auth = getDatabase(app);
+        const taskRef = ref(auth, `users/tasks/${editTaskId}`);
         const deadlineDateTime = new Date(inputValue3).getTime();
         update(taskRef, {
           eventName: inputValue1,
@@ -195,6 +296,17 @@ function Task() {
         });
       };
 
+    const formatDate = (dateString) => {
+      const options = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric'
+      };
+      return new Date(dateString).toLocaleString('en-US', options);
+    };
+    
 
   return (
 
@@ -215,7 +327,7 @@ function Task() {
                 <div className="textfield">
                   <TextField id="standard-basic" label="Title" variant="standard" value={inputValue1} onChange={(e) => setInputValue1(e.target.value)}/>
                   <TextField id="standard-basic" label="Description" variant="standard" value={inputValue2} onChange={(e) => setInputValue2(e.target.value)}/>
-                  <input type='datetime-local' value={inputValue3} onChange={(e) => setInputValue3(e.target.value)}/>
+                  <input type='datetime-local' value={inputValue3} onChange={(e) => setInputValue3(e.target.value)} style={{color:'black',backgroundColor:'transparent'}}/>
                 </div>
               </Box>
             </div>
@@ -263,39 +375,29 @@ function Task() {
       </div>
 
       {/* OUTPUT TASK LIST - MAKIKITA SA LABAS NG MODAL*/}
-      <div className="userlist">
-        <table className="task-table">
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Description</th>
-              <th>Date</th>
-              <th>Priority</th>
-              <th>Categories</th>
-            </tr>
-          </thead>
-          <tbody className="list-body">
-            {tasks.map((task, index) => (
-              <tr key={index}>
-                <td>{task.eventName}</td>
-                <td>{task.eventDescription}</td>
-                {task.eventDate && <span>{new Date(task.deadline).toLocaleString()}</span>}
-                <td>{task.eventPriority}</td>
-                <td>{task.eventCategory}</td>
-                {/* Additional task details based on your data structure */}
-                <div>
-                  <button onClick={handleTaskCompletion}><MdOutlineDone /></button>
-                  <button onClick={() => handleTaskDelete(task.id)}>
-                    <RiDeleteBin6Line/>
-                  </button>
-                  <button onClick={() => handleTaskEdit(task.id)}>
-                    <CiEdit />
-                  </button>
-                </div>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="task-list">
+        {tasks.map((task) => (
+          <div className="task-item">
+            <div>Title: {task.eventName}</div>
+            <div>Description: {task.eventDescription}</div>
+            <div>{formatDate(task.eventDate)}</div>
+            <div><span style={{ color: getPriorityColor(task.eventPriority) }}>{task.eventPriority}</span></div>
+            <div>{task.eventCategory}</div>
+
+            <div className="button-side">
+              <button onClick={() => handleTaskCompletion(task.id)}className="task-button">
+                <MdOutlineDone />
+              </button>
+              <button onClick={() => handleTaskDelete(task.id)} className="task-button delete-button">
+                <RiDeleteBin6Line />
+              </button>
+              <button onClick={() => handleTaskEdit(task.id)} className="task-button edit-button">
+                <CiEdit />
+              </button>
+            </div>
+            
+          </div>
+        ))}
       </div>
     </div>
   );
