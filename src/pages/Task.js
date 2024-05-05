@@ -135,7 +135,7 @@ function Task() {
   const saveData = async () => {
     const auth = getDatabase(app);
     const counterRef = ref(auth,"users/counter/pendingtask/count")
-    const newDocRef = push(ref(auth, "users/tasks"));
+    const newDocRef = push(ref(auth, "users/task"));
     const deadlineDateTime = new Date(inputValue3).getTime(); // Convert deadline to timestamp
     set(newDocRef, {
       eventName: inputValue1,
@@ -182,7 +182,7 @@ function Task() {
     const handleTaskCompletion = (taskId) => {
       const auth = getDatabase(app);
       const newDocRef = push(ref(auth, "users/task"));
-      const taskRef = ref(auth, `users/tasks/${taskId}`)
+      const taskRef = ref(auth, `users/task/${taskId}`)
     // Assuming you have a way to identify the task to mark as completed
     const completedTaskData = {
       eventName: inputValue1,
@@ -232,7 +232,7 @@ function Task() {
   /* PAGKUHA NG DATA SA REALTIME DATABASE */
   useEffect(() => {
     const auth = getDatabase(app);
-    const tasksRef = ref(auth, 'users/tasks');
+    const tasksRef = ref(auth, 'users/task');
     onValue(tasksRef, (snapshot) => {
       const tasksData = snapshot.val();
       if (tasksData) {
@@ -250,7 +250,7 @@ function Task() {
 
   const handleTaskDelete = (taskId) => {
     const auth = getDatabase(app);
-    const taskRef = ref(auth, `users/tasks/${taskId}`);
+    const taskRef = ref(auth, `users/task/${taskId}`);
     remove(taskRef)
       .then(() => {
         alert("Task deleted successfully");
@@ -276,7 +276,7 @@ function Task() {
     
       const updateTask = async () => {
         const auth = getDatabase(app);
-        const taskRef = ref(auth, `users/tasks/${editTaskId}`);
+        const taskRef = ref(auth, `users/task/${editTaskId}`);
         const deadlineDateTime = new Date(inputValue3).getTime();
         update(taskRef, {
           eventName: inputValue1,
