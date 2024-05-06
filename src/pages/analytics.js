@@ -13,6 +13,7 @@ const Analytics = () => {
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState("");
   const [totalTaskValue, setTotalTaskValue] = useState();
+
   const [completedTask, setCompletedTask] = useState([
     { day: "Sunday", count: 0 },
     { day: "Monday", count: 0 },
@@ -28,9 +29,9 @@ const Analytics = () => {
 
   const handleMouseEnter = () => {
       let feedbackMessage = '';
-      if (completedTaskRate >= 0.7) {
+      if (completedTaskRate >= 70) {
         feedbackMessage = "You are great and productive! Keep it up!";
-      } else if (completedTaskRate >= 0.5) {
+      } else if (completedTaskRate >= 50) {
         feedbackMessage = "You're doing well, but there's room for improvement.";
       } else {
         feedbackMessage = "You should do something to catch up.";
@@ -70,25 +71,37 @@ const Analytics = () => {
     }, []);
  
     useEffect(() => {
-        const db = getDatabase();
-        const totalTaskRef = ref(db, 'users/counter/totaltask');
-        const unsubscribe = onValue(totalTaskRef, (snapshot) => {
-            const data = snapshot.val();
-            setTotalTaskValue(data.count);
-            // Calculate the completion rate
-            if (data.count > 0) {
-                setCompletedTaskRate(completedTaskValue / data.count);
+      const db = getDatabase();
+      const totalTaskRef = ref(db, 'users/counter/totaltask');
+      const unsubscribe = onValue(totalTaskRef, (snapshot) => {
+          const data = snapshot.val();
+          setTotalTaskValue(data.count);
+          
+          // Calculate the completion rate
+          if (data.count > 0) {
+            setCompletedTaskRate(completedTaskValue / (completedTaskValue + pendingTask));
+            /* if (completedTaskValue > data.count){
+              setCompletedTaskRate(completedTaskValue / (completedTaskValue + pendingTask));
             }
-        });
-    
-        return () => {
-            unsubscribe();
-        };
-    }, [completedTaskValue]);
+            else {
+              setCompletedTaskRate(1.0)
+            } */
+          }
+          else if(completedTaskValue > data.count) {
+            setCompletedTaskRate(1.0)
+          }
+         
+      });
+  
+      return () => {
+          unsubscribe();
+      };
+  }, [completedTaskValue, pendingTask]);
+  
+  
+  
    
-   
-  // isang beses magrurun
-  useEffect(() => {
+useEffect(() => {
     const ctx = document.getElementById('myChart').getContext('2d');
     let date = new Date();
     let dayToday;
@@ -126,7 +139,6 @@ const Analytics = () => {
     
     if (sunday)
         console.log( sunday.count=completedTaskValue)
-   
     else if (monday)
         monday.count=completedTaskValue;
     else if (tuesday)
@@ -234,11 +246,11 @@ useEffect(() => {
 
           <div className='top' style={{display:'flex',alignItems:'center',marginBottom:'15px',gap:'1rem'}}>
               <div className='bg-[#15161a] flex-col py-[40px] px-[30px] gap-[15px] rounded-[20px] h-[30px] w-[100%] shadow-inner  '>
-                <h1 className='text-[50px] leading-[1px] px-[300px] leading-[1px]'>{completedTaskValue}</h1>
+                <h1 className='text-[50px] leading-[1px] px-[300px]'>{completedTaskValue}</h1>
                 <h1 className='text-[30px] leading-[9px]'>Completed Task</h1>  
             </div>
             <div className='bg-[#15161a] flex-col py-[40px] px-[30px] gap-[15px] rounded-[20px] h-[30px] w-[100%] shadow-inner '>
-                <h1 className='text-[50px] leading-[1px] px-[300px] leading-[1px]'>{pendingTask}</h1>
+                <h1 className='text-[50px] leading-[1px] px-[300px] '>{pendingTask}</h1>
                 <h1 className='text-[30px] leading-[9px]'>Pending Task</h1>
             </div>
           </div>
@@ -249,7 +261,7 @@ useEffect(() => {
               <canvas id="myChart"></canvas>
           </div>
 
-          <div className='bottom' style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
+          {/* <div className='bottom' style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
             <div className='bg-[#15161a] flex-col py-[40px] px-[30px] gap-[15px] rounded-[20px] h-[230px] w-[300px] shadow-inner '>
               <h1 className='text-[20px] leading-[9px]'>Task in Next 7 Days</h1> {filterTasks('nextMonth').map((item, index) => (
                   <ul key={index}>
@@ -258,8 +270,8 @@ useEffect(() => {
                       </li>
                   </ul>
               ))}
-          </div>
-          <div className='bg-[#15161a] flex-col py-[40px] px-[30px] gap-[15px] rounded-[20px] h-[200px] w-[100%] shadow-inner'>
+          </div> */}
+          <div className='bg-[#15161a] flex-col py-[40px] px-[30px] gap-[15px] rounded-[20px] h-[200px] w-[290px] shadow-inner'>
               <h1 className='text-[20px] leading-[9px] m-1'>Completion Rate</h1>
               <div className="circular-progress" style={{ position: "relative", width: "100px", height: "100px" }}>
                   <svg className="circle" width="500" height="500 ">
@@ -270,6 +282,8 @@ useEffect(() => {
                           fill="none"
                           stroke="#f1e092"
                           strokeWidth="8"
+                          onMouseEnter={handleMouseEnter} 
+                          onMouseLeave={handleMouseLeave}
                       />
                       <circle
                           cx="50"
@@ -280,22 +294,24 @@ useEffect(() => {
                           strokeWidth="8"
                           strokeDasharray={`${completedTaskRate * 360}, 360`}
                           transform="rotate(-90 50 50)"
+                          onMouseEnter={handleMouseEnter} 
+                          onMouseLeave={handleMouseLeave}
                       />
-                      <text x="50" y="55" textAnchor="middle" fontSize="24" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-                          {Math.round(completedTaskRate * 100)}%
+                      <text x="50" y="55" textAnchor="middle" fontSize="20" onMouseEnter={handleMouseEnter} 
+                        onMouseLeave={handleMouseLeave}>
+                        {Math.round(completedTaskRate * 100)}%
                       </text>
                   </svg>
                   {showFeedback && (
-                      <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", background: "#f1e092", height: "50px", width: "200px", padding: "5px", border: "1px solid #f1e092", borderRadius: "5px", boxShadow: "0 2px 5px rgba(0,0,0,0.2)" }}>
+                      <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", height: "50px", width: "200px", padding: "5px", boxShadow: "0 2px 5px rgba(0,0,0,0.2)" }}>
                           {feedbackMessage}
                       </div>
                   )}
               </div>
           </div>
-            </div>
-          </div>
+        </div>
+        </div>
            
-      </div>
   )
 }
 

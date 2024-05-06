@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 
 /* REALTIME DATABASE */
 import app from "../context/firebaseconfig";
-import { getDatabase, ref, set, push, onValue, remove, update} from "firebase/database";
+import { getDatabase, ref, set, push, onValue, remove, update ,get} from "firebase/database";
 
 //COMPONENTS AND ICONS
 import { Modal } from "flowbite-react";
@@ -134,8 +134,8 @@ function Task() {
   /* PARA MALAMAN KUNG NAG SAVE NABA AT MAG SAVE SA DATABASE */
   const saveData = async () => {
     const auth = getDatabase(app);
+    const newDocRef = push(ref(auth, "users/tasks"));
     const counterRef = ref(auth,"users/counter/pendingtask/count")
-    const newDocRef = push(ref(auth, "users/task"));
     const deadlineDateTime = new Date(inputValue3).getTime(); // Convert deadline to timestamp
     set(newDocRef, {
       eventName: inputValue1,
@@ -148,7 +148,9 @@ function Task() {
       alert("Data saved successfully");
       incrementCounter();
       totalTaskCounter();
+      setOpenModal(false);
       scheduleNotification(deadlineDateTime); // Schedule notification for deadline
+      clearForm(); 
     }).catch((error) => {
       alert("Error: " + error.message);
     });
@@ -181,8 +183,8 @@ function Task() {
     /* PAGSASAVE NG TASK REKTA SA REALTIME DATABASE */
     const handleTaskCompletion = (taskId) => {
       const auth = getDatabase(app);
-      const newDocRef = push(ref(auth, "users/task"));
-      const taskRef = ref(auth, `users/task/${taskId}`)
+      /* const newDocRef = push(ref(auth, "users/tasks")); */
+      const taskRef = ref(auth, `users/tasks/${taskId}`)
     // Assuming you have a way to identify the task to mark as completed
     const completedTaskData = {
       eventName: inputValue1,
@@ -192,7 +194,7 @@ function Task() {
       eventCategory: newCategory,
       completionDate: new Date().toISOString() // Save completion date
     };
-    set(newDocRef, completedTaskData)
+    update(taskRef, completedTaskData)
       .then(() => {
         alert("Task marked as completed");
         console.log(tasks)
@@ -200,7 +202,7 @@ function Task() {
         decrementCounter();
         decrementTotalTaskCounter();
         remove(taskRef)
-        notifyTaskCompletion(inputValue1); // Trigger completion notification
+        notifyTaskCompletion(taskId); // Trigger completion notification
       })
       .catch((error) => {
         alert("Error marking task as completed: " + error.message);
@@ -232,7 +234,7 @@ function Task() {
   /* PAGKUHA NG DATA SA REALTIME DATABASE */
   useEffect(() => {
     const auth = getDatabase(app);
-    const tasksRef = ref(auth, 'users/task');
+    const tasksRef = ref(auth, 'users/tasks');
     onValue(tasksRef, (snapshot) => {
       const tasksData = snapshot.val();
       if (tasksData) {
@@ -250,15 +252,39 @@ function Task() {
 
   const handleTaskDelete = (taskId) => {
     const auth = getDatabase(app);
-    const taskRef = ref(auth, `users/task/${taskId}`);
-    remove(taskRef)
-      .then(() => {
-        alert("Task deleted successfully");
+    const taskRef = ref(auth, `users/tasks/${taskId}`);
+  
+    // Fetch the task data to check its completion status
+    get(taskRef)
+      .then((snapshot) => {
+        const taskData = snapshot.val();
+        const isCompleted = taskData && taskData.completionDate; // Check if task is completed
+  
+        // Remove the task from the database
+        remove(taskRef)
+          .then(() => {
+            alert("Task deleted successfully");
+  
+            // Update the pending task counter if the task was not completed
+            if (!isCompleted) {
+              const counterRef = ref(auth, "users/counter/pendingtask/count");
+              // Fetch the current count
+              get(counterRef).then((counterSnapshot) => {
+                const currentCount = counterSnapshot.val() || 0;
+                // Decrease the count by 1
+                set(counterRef, currentCount - 1);
+              });
+            }
+          })
+          .catch((error) => {
+            alert("Error deleting task: " + error.message);
+          });
       })
       .catch((error) => {
-        alert("Error deleting task: " + error.message);
+        alert("Error fetching task data: " + error.message);
       });
   };
+  
   
   const handleTaskEdit = (taskId) => {
         const taskToEdit = tasks.find(task => task.id === taskId);
@@ -275,26 +301,48 @@ function Task() {
       };
     
       const updateTask = async () => {
-        const auth = getDatabase(app);
-        const taskRef = ref(auth, `users/task/${editTaskId}`);
-        const deadlineDateTime = new Date(inputValue3).getTime();
-        update(taskRef, {
-          eventName: inputValue1,
-          eventDescription: inputValue2,
-          eventDate: inputValue3,
-          eventPriority: newPriority,
-          eventCategory: newCategory,
-          deadline: deadlineDateTime
-        }).then(() => {
-          alert("Task updated successfully");
-          setOpenModal(false);
-          setEditMode(false);
-          setEditTaskId(null);
-          clearForm();
-        }).catch((error) => {
-          alert("Error updating task: " + error.message);
-        });
-      };
+      const auth = getDatabase(app);
+      const taskRef = ref(auth, `users/tasks/${editTaskId}`);
+    
+      // Convert current input date to timestamp
+      const updatedDeadlineDateTime = new Date(inputValue3).getTime();
+    
+      try {
+        // Fetch the existing task data for comparison
+        const snapshot = await get(taskRef);
+        const existingTask = snapshot.val();
+    
+        // Determine if the deadline has changed
+        const originalDeadline = existingTask.deadline;
+        const deadlineChanged = originalDeadline !== updatedDeadlineDateTime;
+    
+        // Prepare updated task data
+        const updatedTaskData = {
+          eventName: inputValue1,
+          eventDescription: inputValue2,
+          eventDate: inputValue3,
+          eventPriority: newPriority,
+          eventCategory: newCategory,
+          deadline: updatedDeadlineDateTime
+        };
+        // Update task in the database
+        await update(taskRef, updatedTaskData);
+        // Show success message
+        alert("Task updated successfully");
+        // Close modal and clear form inputs
+        setOpenModal(false);
+        clearForm();
+        setEditMode(false);
+        setEditTaskId(null);
+        // Schedule notification only if the deadline has changed
+        if (deadlineChanged) {
+          scheduleNotification(updatedDeadlineDateTime);
+        }
+      } catch (error) {
+        alert("Error updating task: " + error.message);
+      }
+    };
+    
 
     const formatDate = (dateString) => {
       const options = {
