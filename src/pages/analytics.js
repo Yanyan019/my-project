@@ -5,6 +5,7 @@ import { getDatabase } from "firebase/database";
 import { auth } from "../context/firebaseconfig";
 
 const Analytics = () => {
+  
 
   const [pendingTask, setPendingTask] = useState(0);
   const [completedTaskValue, setCompletedTaskValue] = useState(0);
@@ -14,7 +15,7 @@ const Analytics = () => {
   const [totalTaskValue, setTotalTaskValue] = useState();
   const [completedTask, setCompletedTask] = useState([
     { day: "Sunday", count: 0 },
-    { day: "Monday", count: 0 },
+    { day: "Monday", count: 0 },  
     { day: "Tuesday", count: 0 },
     { day: "Wednesday", count: 0 },
     { day: "Thursday", count: 0 },
@@ -91,7 +92,7 @@ const Analytics = () => {
         };
     }, [completedTaskValue]);
    
-   
+
   // isang beses magrurun
   useEffect(() => {
     const ctx = document.getElementById('myChart').getContext('2d');
@@ -257,6 +258,16 @@ useEffect(() => {
           <h1 className='text-[20px] leading-[9px]'>Graph</h1>
           <canvas id="myChart"></canvas>
         </div>
+        {/*<div className='bg-[#fff8dc] flex-col py-[40px] px-[30px] gap-[15px] rounded-[20px] h-[230px] w-[300px] shadow-inner absolute left-[1150px] top-[200px] '>
+          <h1 className='text-[20px] leading-[9px]'>Task in Next 7 Days </h1>
+         /* {task.map((task, index) => (
+              <tr key={index}>
+
+                <td>{task.eventDescription}</td>
+                <td>{task.eventName}</td>
+              </tr>
+            ))}
+        </div>*/}
         <div className='bg-[#fff8dc] flex-col py-[40px] px-[30px] gap-[15px] rounded-[20px] h-[200px] w-[300px] shadow-inner absolute left-[1150px] top-[440px]'>
         <h1 className='text-[20px] leading-[9px] m-1'>Completion Rate</h1>
         <div className="circular-progress" style={{ position: "relative", width: "100px", height: "100px" }}>
@@ -268,6 +279,8 @@ useEffect(() => {
           fill="none"
           stroke="#ddd"
           strokeWidth="8"
+          onMouseEnter={handleMouseEnter} 
+          onMouseLeave={handleMouseLeave}
         />
         <circle
           cx="50"
@@ -278,8 +291,11 @@ useEffect(() => {
           strokeWidth="8"
           strokeDasharray={`${completedTaskRate * 360}, 360`}
           transform="rotate(-90 50 50)"
+          onMouseEnter={handleMouseEnter} 
+          onMouseLeave={handleMouseLeave}
         />
-        <text x="50" y="55" textAnchor="middle" fontSize="16" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+        <text x="50" y="55" textAnchor="middle" fontSize="20" onMouseEnter={handleMouseEnter} 
+          onMouseLeave={handleMouseLeave}>
           {Math.round(completedTaskRate * 100)}%
         </text>
       </svg>
