@@ -75,22 +75,21 @@ const Analytics = () => {
         const unsubscribe = onValue(totalTaskRef, (snapshot) => {
             const data = snapshot.val();
             setTotalTaskValue(data.count);
+          
             // Calculate the completion rate
             if (data.count > 0) {
-              if (completedTaskValue > data.count){
-                setCompletedTaskRate(1.0)
-              }
-              else {
-                setCompletedTaskRate(completedTaskValue / data.count);
-              }
-                
-            } 
+              setCompletedTaskRate(completedTaskValue / (completedTaskValue + pendingTask));
+            }
+            else if(completedTaskValue > data.count) {
+              setCompletedTaskRate(1.0)
+            }
+           
         });
     
         return () => {
             unsubscribe();
         };
-    }, [completedTaskValue]);
+    }, [completedTaskValue, pendingTask]);
    
 
   // isang beses magrurun
@@ -151,7 +150,7 @@ const Analytics = () => {
   
     const existingChart = Chart.getChart('myChart');
     if (existingChart) {
-      existingChart.destroy(); // Destroy the existing chart
+      existingChart.destroy(); 
     }
     new Chart(ctx, {
       type: 'bar',
@@ -243,9 +242,6 @@ useEffect(() => {
     <div className=''>
         <div className=' '>
         </div>
-        {/* <div className='bg-[#f5fffa] flex-col py-[20px] px-[15px] gap-[15px] rounded-[10px] h-[70px] w-[200px] absolute left-[1300px] top-[45px]'>
-            <h1 className='text-[20px] leading-[25px] font-extrabold'>TASK OVERVIEW</h1>
-        </div> */}
         <div className='bg-[#fff8dc] flex-col py-[40px] px-[30px] gap-[15px] rounded-[20px] h-[30px] w-[450px] shadow-inner absolute left-[500px] top-[100px] '>
           <h1 className='text-[50px] leading-[1px] px-[300px] leading-[1px]'>{completedTaskValue}</h1>
           <h1 className='text-[30px] leading-[9px]'>Completed Task</h1>  
@@ -258,16 +254,6 @@ useEffect(() => {
           <h1 className='text-[20px] leading-[9px]'>Graph</h1>
           <canvas id="myChart"></canvas>
         </div>
-        {/*<div className='bg-[#fff8dc] flex-col py-[40px] px-[30px] gap-[15px] rounded-[20px] h-[230px] w-[300px] shadow-inner absolute left-[1150px] top-[200px] '>
-          <h1 className='text-[20px] leading-[9px]'>Task in Next 7 Days </h1>
-         /* {task.map((task, index) => (
-              <tr key={index}>
-
-                <td>{task.eventDescription}</td>
-                <td>{task.eventName}</td>
-              </tr>
-            ))}
-        </div>*/}
         <div className='bg-[#fff8dc] flex-col py-[40px] px-[30px] gap-[15px] rounded-[20px] h-[200px] w-[300px] shadow-inner absolute left-[1150px] top-[440px]'>
         <h1 className='text-[20px] leading-[9px] m-1'>Completion Rate</h1>
         <div className="circular-progress" style={{ position: "relative", width: "100px", height: "100px" }}>
