@@ -76,8 +76,14 @@ const Analytics = () => {
             setTotalTaskValue(data.count);
             // Calculate the completion rate
             if (data.count > 0) {
+              if (completedTaskValue > data.count){
+                setCompletedTaskRate(1.0)
+              }
+              else {
                 setCompletedTaskRate(completedTaskValue / data.count);
-            }
+              }
+                
+            } 
         });
     
         return () => {
@@ -187,7 +193,7 @@ const Analytics = () => {
 
   const fetchTasks = () => {
     const db = getDatabase();
-    const tasksRef = ref(db, 'users/counter');
+    const tasksRef = ref(db, 'users/tasks');
     let fetchedTasks = [];
 
     const unsubscribe = onValue(tasksRef, (snapshot) => {
@@ -195,16 +201,20 @@ const Analytics = () => {
         for(let id in data){
             let task = data[id];
             fetchedTasks.push({
-                name: task.name,
-                description: task.description,
-                event: task.event,
+                eventName: task.eventNname,
+                eventDescription: task.eventDescription,
+                eventPriority: task.eventPriority,
+                eventDate: task.eventDate,
+                eventCategory: task.eventCategory,
+                deadline: task.deadline,
                 duedate: new Date(task.duedate) // Assuming dueDate is stored as a timestamp
             });
         }
         setTask(fetchedTasks);
     });
 
-    return unsubscribe;
+  return unsubscribe;
+
 };
 
 useEffect(() => {
@@ -252,7 +262,7 @@ useEffect(() => {
             {filterTasks('nextMonth').map((item, index) => (
           <ul key={index}>
             <li>
-              <strong>Event Name:</strong> {item.event}<br />
+              <strong>Event Name:</strong> {item.eventName}<br />
             </li>
           </ul>
         ))}
