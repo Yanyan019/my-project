@@ -257,16 +257,6 @@ useEffect(() => {
           <h1 className='text-[20px] leading-[9px]'>Graph</h1>
           <canvas id="myChart"></canvas>
         </div>
-        <div className='bg-[#fff8dc] flex-col py-[40px] px-[30px] gap-[15px] rounded-[20px] h-[230px] w-[300px] shadow-inner absolute left-[1150px] top-[200px] '>
-          <h1 className='text-[20px] leading-[9px]'>Task in Next 7 Days </h1>
-            {filterTasks('nextMonth').map((item, index) => (
-          <ul key={index}>
-            <li>
-              <strong>Event Name:</strong> {item.eventName}<br />
-            </li>
-          </ul>
-        ))}
-        </div>
         <div className='bg-[#fff8dc] flex-col py-[40px] px-[30px] gap-[15px] rounded-[20px] h-[200px] w-[300px] shadow-inner absolute left-[1150px] top-[440px]'>
         <h1 className='text-[20px] leading-[9px] m-1'>Completion Rate</h1>
         <div className="circular-progress" style={{ position: "relative", width: "100px", height: "100px" }}>
