@@ -24,7 +24,7 @@ const Signin = () => {
   }, [navigate, user]);
 
   return (
-    <div className='flex items-center justify-center h-screen bg-gray-200'>
+    <div className='flex items-center justify-center h-screen bg-custome-text-color'>
       <form className='flex flex-col items-center p-10 bg-white rounded shadow-md'>
         <img className='w-24 h-24 mb-5' src={taskifyLogo} alt='Taskify Logo' />
         <p className='mb-5 text-center text-gray-600'>Get organized, Achieve more <br /> with Taskify</p>
