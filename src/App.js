@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import {  useAuth } from './context/AuthContext';
 import './App.css';
 import Navbar from './components/navbar';
+
 //COMPONENTS
 import Signin from './pages/signin';
 import Task from './pages/Task';
